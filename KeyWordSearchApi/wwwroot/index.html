@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Search for Keywords</title>
+    <script type="text/javascript" src="jquery-2.1.3.min.js"></script>
+</head>
+<body>
+    <script type="text/javascript">
+        function SearchKeyword() {
+            var serviceUrl = "http://localhost:8231/KeyWordSearchApi/search";
+            var keyword = $("#searchWordInput").val();
+            var uri1 = $("#uri1").val();
+            var uri2 = $("#uri2").val();
+            var uri3 = $("#uri3").val();
+            var uri4 = $("#uri4").val();
+            var uri5 = $("#uri5").val();
+            var uri6 = $("#uri6").val();
+
+            var uris = [];
+            if(uri1 && uri1 != "") uris[0] = uri1;
+            if(uri2 && uri2 != "") uris[1] = uri2;
+            if(uri3 && uri3 != "") uris[2] = uri3;
+            if(uri4 && uri4 != "") uris[3] = uri4;
+            if(uri5 && uri5 != "") uris[4] = uri5;
+            if(uri6 && uri6 != "") uris[5] = uri6;
+
+
+            $.ajax({
+                url: serviceUrl,
+                method: 'POST',
+                data: {
+                    "keyword": keyword,
+                    "uris": uris
+                }
+            })
+           .done(function (searchResult) {
+               $('#resultsTable > tbody').children().remove();
+               for (var i = 0; i < searchResult.HitsByUri.length; i++) {
+                   var count = "";
+
+                   if (searchResult.HitsByUri[i].m_Item2 == -1) count = "Error";
+                   else count = searchResult.HitsByUri[i].m_Item2.toString();
+
+                   $('#resultsTable > tbody:last-child').append("<tr><td>" + searchResult.HitsByUri[i].m_Item1 + "</td><td>" + count + "</td></tr>");
+               }
+           });
+        }
+    </script>
+
+    <div id="searchBox">
+        <label for="searchWordInput">Search Term</label>
+        <input type="text" id="searchWordInput" name="searchWordInput" />
+        <table id="searchTable">
+            <thead>
+                <tr>
+                    <th>URL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><input type="url" id="uri1" name="uri1" /></td></tr>
+                <tr><td><input type="url" id="uri2" name="uri2" /></td></tr>
+                <tr><td><input type="url" id="uri3" name="uri3" /></td></tr>
+                <tr><td><input type="url" id="uri4" name="uri4" /></td></tr>
+                <tr><td><input type="url" id="uri5" name="uri5" /></td></tr>
+                <tr><td><input type="url" id="uri6" name="uri6" /></td></tr>
+            </tbody>
+        </table>
+        <br />
+        <button type="button" id="sendSearchData" value="Search" onclick="SearchKeyword()">Search</button>
+        <br /><br />
+        <table id="resultsTable">
+            <caption>Search Results</caption>
+            <thead>
+                <tr>
+                    <th>URL</th>
+                    <th>Hits</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</body>
+</html>
